@@ -725,7 +725,9 @@ reverse_proxy_error_t reverse_proxy_send_plist(reverse_proxy_client_t client, pl
 		return REVERSE_PROXY_E_INVALID_ARG;
 	}
 
+#ifdef VERBOSE_LOGGING
 	debug_info("Sending %u bytes", len);
+#endif
 
 	uint32_t slen = htole32(len);
 	err = reverse_proxy_send(client, (char*)&slen, sizeof(slen), &bytes);

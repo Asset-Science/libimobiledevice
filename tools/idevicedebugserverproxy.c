@@ -282,7 +282,9 @@ int main(int argc, char *argv[])
 	}
 
 	/* start services and connect to device */
-	ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX);
+	bool stop = false;
+	ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop);
+	
 	if (ret != IDEVICE_E_SUCCESS) {
 		if (udid) {
 			fprintf(stderr, "No device found with udid %s.\n", udid);
