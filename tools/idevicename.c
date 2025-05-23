@@ -112,8 +112,9 @@ int main(int argc, char** argv)
 		return 2;
 	}
 
+	bool stop = false;
 	idevice_t device = NULL;
-	if (idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX) != IDEVICE_E_SUCCESS) {
+	if (idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop) != IDEVICE_E_SUCCESS) {
 		if (udid) {
 			fprintf(stderr, "ERROR: No device found with udid %s.\n", udid);
 		} else {

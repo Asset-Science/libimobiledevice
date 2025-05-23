@@ -119,7 +119,8 @@ int main(int argc, char **argv)
 
 	switch (mode) {
 	case MODE_SHOW_ID:
-		idevice_new_with_options(&device, udid, IDEVICE_LOOKUP_USBMUX | IDEVICE_LOOKUP_NETWORK);
+		bool stop = false;
+		idevice_new_with_options(&device, udid, IDEVICE_LOOKUP_USBMUX | IDEVICE_LOOKUP_NETWORK, &stop);
 		if (!device) {
 			fprintf(stderr, "ERROR: No device with UDID %s attached.\n", udid);
 			return -2;

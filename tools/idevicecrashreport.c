@@ -445,8 +445,8 @@ int main(int argc, char* argv[])
 		fprintf(stderr, "ERROR: Directory '%s' does not exist.\n", target_directory);
 		return 1;
 	}
-
-	device_error = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX);
+	bool stop = false;
+	device_error = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop);
 	if (device_error != IDEVICE_E_SUCCESS) {
 		if (udid) {
 			printf("No device found with udid %s.\n", udid);

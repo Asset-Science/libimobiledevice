@@ -60,7 +60,7 @@ libimobiledevice_1_0_la_SOURCES = \
 	syslog_relay.c syslog_relay.h \
 	bt_packet_logger.c bt_packet_logger.h
 
-if WIN32
+if _WIN32
 libimobiledevice_1_0_la_LDFLAGS += -avoid-version -static-libgcc
 libimobiledevice_1_0_la_LIBADD += -lole32 -lws2_32 -lgdi32
 endif

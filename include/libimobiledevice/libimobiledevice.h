@@ -28,14 +28,21 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#include <stdbool.h>
 #endif
 
 #include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <plist/plist.h>
 
-#if defined(_MSC_VER)
-#include <basetsd.h>
-typedef SSIZE_T ssize_t;
+#ifndef LIBIMOBILEDEVICE_API_MSC
+#ifdef _MSC_VER
+#define LIBIMOBILEDEVICE_API_MSC __declspec( dllexport )
+#else
+#define LIBIMOBILEDEVICE_API_MSC
+#endif
 #endif
 
 #ifndef LIBIMOBILEDEVICE_API
@@ -119,6 +126,22 @@ typedef struct idevice_subscription_context* idevice_subscription_context_t;
  */
 LIBIMOBILEDEVICE_API void idevice_set_debug_level(int level);
 
+
+/**
+ * redirect debug logs
+ *
+ * @param stream to redirect debug logs to
+ */
+LIBIMOBILEDEVICE_API void idevice_set_stderr(void *stream);
+
+
+/**
+ * init thread safe debug logging
+ *
+ * @param stream to redirect debug logs to
+ */
+LIBIMOBILEDEVICE_API void idevice_init_mutex();
+
 /**
  * Subscribe a callback function that will be called when device add/remove
  * events occur.
@@ -183,7 +206,7 @@ LIBIMOBILEDEVICE_API idevice_error_t idevice_event_unsubscribe(void);
  *   network devices in the list, use idevice_get_device_list_extended().
  * @see idevice_get_device_list_extended
  */
-LIBIMOBILEDEVICE_API idevice_error_t idevice_get_device_list(char ***devices, int *count);
+LIBIMOBILEDEVICE_API idevice_error_t idevice_get_device_list(char ***devices, int *count, bool *stop);
 
 /**
  * Free a list of device UDIDs.
@@ -203,7 +226,7 @@ LIBIMOBILEDEVICE_API idevice_error_t idevice_device_list_free(char **devices);
  *
  * @return IDEVICE_E_SUCCESS on success or an error value when an error occurred.
  */
-LIBIMOBILEDEVICE_API idevice_error_t idevice_get_device_list_extended(idevice_info_t **devices, int *count);
+LIBIMOBILEDEVICE_API idevice_error_t idevice_get_device_list_extended(idevice_info_t **devices, int *count, bool* stop);
 
 /**
  * Free an extended device list retrieved through idevice_get_device_list_extended().
@@ -233,7 +256,7 @@ LIBIMOBILEDEVICE_API idevice_error_t idevice_device_list_extended_free(idevice_i
  *
  * @return IDEVICE_E_SUCCESS if ok, otherwise an error code.
  */
-LIBIMOBILEDEVICE_API idevice_error_t idevice_new(idevice_t *device, const char *udid);
+LIBIMOBILEDEVICE_API idevice_error_t idevice_new(idevice_t *device, const char *udid, bool* stop);
 
 /**
  * Creates an idevice_t structure for the device specified by UDID,
@@ -256,7 +279,7 @@ LIBIMOBILEDEVICE_API idevice_error_t idevice_new(idevice_t *device, const char *
  *
  * @return IDEVICE_E_SUCCESS if ok, otherwise an error code.
  */
-LIBIMOBILEDEVICE_API idevice_error_t idevice_new_with_options(idevice_t *device, const char *udid, enum idevice_options options);
+LIBIMOBILEDEVICE_API idevice_error_t idevice_new_with_options(idevice_t *device, const char *udid, enum idevice_options options, bool* stop);
 
 /**
  * Cleans up an idevice structure, then frees the structure itself.

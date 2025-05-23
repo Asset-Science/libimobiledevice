@@ -20,6 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#define PACKAGE_VERSION "1.3.0"
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -117,8 +118,8 @@ static void print_usage(int argc, char **argv, int is_error)
 	}
 	fprintf(is_error ? stderr : stdout,
 		"\n" \
-		"Homepage:    <" PACKAGE_URL ">\n"
-		"Bug Reports: <" PACKAGE_BUGREPORT ">\n"
+		"Homepage:    <"  ">\n"
+		"Bug Reports: <"  ">\n"
 	);
 }
 
@@ -209,7 +210,8 @@ int main(int argc, char *argv[])
 	argc -= optind;
 	argv += optind;
 
-	ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX);
+	bool stop = false;
+	ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop);
 	if (ret != IDEVICE_E_SUCCESS) {
 		if (udid) {
 			fprintf(stderr, "ERROR: Device %s not found!\n", udid);

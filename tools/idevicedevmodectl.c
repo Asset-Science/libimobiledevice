@@ -105,7 +105,8 @@ static int get_developer_mode_status(const char* device_udid, int _use_network)
 	lockdownd_error_t lerr = LOCKDOWN_E_UNKNOWN_ERROR;
 	plist_t val = NULL;
 
-	ret = idevice_new_with_options(&device, device_udid, (_use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX);
+	bool stop = false;
+	ret = idevice_new_with_options(&device, device_udid, (_use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop);
 	if (ret != IDEVICE_E_SUCCESS) {
 		return -1;
 	}
@@ -355,7 +356,8 @@ int main(int argc, char *argv[])
 
 	WAIT_FOR(device_connected, 10);
 
-	ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX);
+	bool stop = false;
+	ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop);
 	if (ret != IDEVICE_E_SUCCESS) {
 		if (udid) {
 			printf("No device found with udid %s.\n", udid);

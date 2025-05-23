@@ -93,8 +93,8 @@ Version 1.2.0
   - Flush stdout for every line in idevicesyslog
   - Fix shutdown of idevicedebugserverproxy tool which could hang
   - Notify user when erroneously using idevicebackup with iOS 4 or later
-  - Enable build of idevicecrashreport on WIN32
-  - Fix thread handle leaks on WIN32 adding thread_new and thread_free
+  - Enable build of idevicecrashreport on _WIN32
+  - Fix thread handle leaks on _WIN32 adding thread_new and thread_free
   - cython: Add receive/receive_timeout methods for iDeviceConnection to
     receive raw data from a connection
   - cython: Add new FILE_RELAY_E_PERMISSION_DENIED(-6) error
@@ -251,7 +251,7 @@ Version 1.1.5
     calculation on 32 bit architectures and large disk capacities
   - Add support for encrypted and password protected backups to idevicebackup2
   - Fix major "too long filename received" bug in idevicebackup2
-  - Various fixes for proper and tested WIN32 support including MinGW building
+  - Various fixes for proper and tested _WIN32 support including MinGW building
   - Fix various crashers and improve quality of idevicebackup2 tool
   - Add endianness helpers for systems lacking support
   - Fix idevicedate to work on iOS 6+
