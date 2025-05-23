@@ -765,7 +765,7 @@ lockdownd_error_t lockdownd_cu_pairing_create(lockdownd_client_t client, lockdow
 		unsigned int errval = 0;
 		uint64_t u64val = 0;
 		tlv_data_get_uint(data, data_len, 0x07, &u64val);
-        //debug_buffer(data, data_len);
+debug_buffer(data, data_len);
 		errval = (unsigned int)u64val;
 		if (errval > 0) {
 			if (errval == 3) {

@@ -32,8 +32,8 @@
 #define debug_info(...) debug_info_real (__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
 #define debug_plist(a) debug_plist_real (__FUNCTION__, __FILE__, __LINE__, a)
 #else
-#define debug_info(...) debug_info_real (__func__, __FILE__, __LINE__, __VA_ARGS__)
-#define debug_plist(a) debug_plist_real (__func__, __FILE__, __LINE__, a)
+#define debug_info(...)
+#define debug_plist(a)
 #endif
 
 void debug_info_real(const char *func,
@@ -49,7 +49,5 @@ void debug_plist_real(const char *func,
 											plist_t plist);
 
 void internal_set_debug_level(int level);
-void internal_set_stderr(FILE* err);
-void internal_init_mutex();
 
 #endif

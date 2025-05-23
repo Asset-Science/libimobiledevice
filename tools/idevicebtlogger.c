@@ -200,10 +200,8 @@ static void stop_logging(void)
  * Enable HCI log capture
  */
 static int start_logging(void)
-{	
-	bool stop = false;
-	idevice_error_t ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop);
-	if (ret != IDEVICE_E_SUCCESS) {
+{
+	idevice_error_t ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX);
 	if (ret != IDEVICE_E_SUCCESS) {
 		fprintf(stderr, "Device with udid %s not found!?\n", udid);
 		return -1;

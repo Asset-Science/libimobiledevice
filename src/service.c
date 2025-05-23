@@ -141,9 +141,7 @@ service_error_t service_send(service_client_t client, const char* data, uint32_t
 		return SERVICE_E_INVALID_ARG;
 	}
 
-#ifdef VERBOSE_LOGGING
 	debug_info("sending %d bytes", size);
-#endif
 	res = idevice_to_service_error(idevice_connection_send(client->connection, data, size, &bytes));
 	if (res != SERVICE_E_SUCCESS) {
 		debug_info("ERROR: sending to device failed.");

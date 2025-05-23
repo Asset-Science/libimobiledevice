@@ -24,6 +24,6 @@ libinternalcommon_la_SOURCES = \
 	debug.c debug.h \
 	userpref.c userpref.h
 
-if _WIN32
+if WIN32
 libinternalcommon_la_LIBADD += -lole32 -lws2_32
 endif

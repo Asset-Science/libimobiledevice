@@ -212,9 +212,7 @@ mobileactivation_error_t mobileactivation_create_activation_session_info(mobilea
 			ret = MOBILEACTIVATION_E_UNKNOWN_ERROR;
 		} else {
 			*blob = plist_copy(node);
-			plist_free(node);
 		}
-		plist_free(result);
 	}
 
 	return ret;

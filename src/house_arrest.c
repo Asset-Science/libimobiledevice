@@ -95,8 +95,7 @@ house_arrest_error_t house_arrest_client_free(house_arrest_client_t client)
 		house_arrest_error(property_list_service_client_free(client->parent));
 	}
 	client->parent = NULL;
-//	free(client);
-	service_client_free(client);
+	free(client);
 
 	return err;
 }

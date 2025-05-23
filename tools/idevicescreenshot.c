@@ -182,8 +182,7 @@ int main(int argc, char **argv)
 		filename = strdup(argv[0]);
 	}
 
-	bool stop = false;
-	if (IDEVICE_E_SUCCESS != idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX, &stop)) {
+	if (IDEVICE_E_SUCCESS != idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX)) {
 		if (udid) {
 			printf("No device found with udid %s.\n", udid);
 		} else {

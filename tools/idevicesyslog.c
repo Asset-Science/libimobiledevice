@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <stdbool.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -348,8 +347,7 @@ static void syslog_callback(char c, void *user_data)
 
 static int start_logging(void)
 {
-	bool stop = false;
-	idevice_error_t ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMU, &stop)
+	idevice_error_t ret = idevice_new_with_options(&device, udid, (use_network) ? IDEVICE_LOOKUP_NETWORK : IDEVICE_LOOKUP_USBMUX);
 	if (ret != IDEVICE_E_SUCCESS) {
 		fprintf(stderr, "Device with udid %s not found!?\n", udid);
 		return -1;

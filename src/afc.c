@@ -44,9 +44,7 @@
  */
 static void afc_lock(afc_client_t client)
 {
-#ifdef VERBOSE_LOGGING
 	debug_info("Locked");
-#endif
 	mutex_lock(&client->mutex);
 }
 
@@ -57,9 +55,7 @@ static void afc_lock(afc_client_t client)
  */
 static void afc_unlock(afc_client_t client)
 {
-#ifdef VERBOSE_LOGGING
 	debug_info("Unlocked");
-#endif
 	mutex_unlock(&client->mutex);
 }
 
@@ -172,13 +168,11 @@ static afc_error_t afc_dispatch_packet(afc_client_t client, uint64_t operation, 
 	client->afc_packet->entire_length = sizeof(AFCPacket) + data_length + payload_length;
 	client->afc_packet->this_length = sizeof(AFCPacket) + data_length;
 
-#ifdef VERBOSE_LOGGING
 	debug_info("packet length = %i", client->afc_packet->this_length);
-#endif
 
 	/* send AFC packet header and data */
 	AFCPacket_to_LE(client->afc_packet);
-	//debug_buffer((char*)client->afc_packet, sizeof(AFCPacket) + data_length);
+	debug_buffer((char*)client->afc_packet, sizeof(AFCPacket) + data_length);
 	sent = 0;
 	service_send(client->parent, (void*)client->afc_packet, sizeof(AFCPacket) + data_length, &sent);
 	AFCPacket_from_LE(client->afc_packet);
@@ -191,10 +185,10 @@ static afc_error_t afc_dispatch_packet(afc_client_t client, uint64_t operation, 
 	if (payload_length > 0) {
 		if (payload_length > 256) {
 			debug_info("packet payload follows (256/%u)", payload_length);
-			//debug_buffer(payload, 256);
+			debug_buffer(payload, 256);
 		} else {
 			debug_info("packet payload follows");
-			//debug_buffer(payload, payload_length);
+			debug_buffer(payload, payload_length);
 		}
 		service_send(client->parent, payload, payload_length, &sent);
 	}
@@ -271,9 +265,7 @@ static afc_error_t afc_receive_data(afc_client_t client, char **bytes, uint32_t 
 		return AFC_E_IO_ERROR;
 	}
 
-#ifdef VERBOSE_LOGGING
 	debug_info("received AFC packet, full len=%lld, this len=%lld, operation=0x%llx", header.entire_length, header.this_length, header.operation);
-#endif
 
 	entire_len = (uint32_t)header.entire_length - sizeof(AFCPacket);
 	this_len = (uint32_t)header.this_length - sizeof(AFCPacket);
@@ -315,17 +307,13 @@ static afc_error_t afc_receive_data(afc_client_t client, char **bytes, uint32_t 
 		param1 = le64toh(*(uint64_t*)(buf));
 	}
 
-#ifdef VERBOSE_LOGGING
 	debug_info("packet data size = %i", current_count);
-#endif
 	if (current_count > 256) {
-#ifdef VERBOSE_LOGGING
 		debug_info("packet data follows (256/%u)", current_count);
-#endif
-		//debug_buffer(buf, 256);
+		debug_buffer(buf, 256);
 	} else {
 		debug_info("packet data follows");
-		//debug_buffer(buf, current_count);
+		debug_buffer(buf, current_count);
 	}
 
 	/* check operation types */
@@ -341,9 +329,7 @@ static afc_error_t afc_receive_data(afc_client_t client, char **bytes, uint32_t 
 		}
 	} else if (header.operation == AFC_OP_DATA) {
 		/* data response */
-#ifdef VERBOSE_LOGGING
 		debug_info("got a data response");
-#endif
 	} else if (header.operation == AFC_OP_FILE_OPEN_RES) {
 		/* file handle response */
 		debug_info("got a file handle response, handle=%lld", param1);
@@ -747,9 +733,7 @@ afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint
 
 	if (!client || !client->afc_packet || !client->parent || handle == 0)
 		return AFC_E_INVALID_ARG;
-#ifdef VERBOSE_LOGGING
 	debug_info("called for length %i", length);
-#endif
 
 	//uint32_t data_len = 8 + 8;
 
@@ -767,9 +751,7 @@ afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint
 	/* Receive the data */
 	ret = afc_receive_data(client, &input, &bytes_loc);
 	debug_info("afc_receive_data returned error: %d", ret);
-#ifdef VERBOSE_LOGGING
 	debug_info("bytes returned: %i", bytes_loc);
-#endif
 	if (ret != AFC_E_SUCCESS) {
 		afc_unlock(client);
 		return ret;
@@ -783,9 +765,7 @@ afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint
 		return ret;
 	}
 	if (input) {
-#ifdef VERBOSE_LOGGING
 		debug_info("%d", bytes_loc);
-#endif
 		memcpy(data + current_count, input, (bytes_loc > length) ? length : bytes_loc);
 		free(input);
 		input = NULL;
@@ -797,7 +777,7 @@ afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_file_write(afc_client_t client, uint64_t handle, const char *data, uint32_t length, uint32_t *bytes_written)
+afc_error_t afc_file_write(afc_client_t client, uint64_t handle, const char *data, uint32_t length, uint32_t *bytes_written)
 {
 	uint32_t current_count = 0;
 	uint32_t bytes_loc = 0;
@@ -832,7 +812,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_file_write(afc_client_t client, uint64_t ha
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_file_close(afc_client_t client, uint64_t handle)
+afc_error_t afc_file_close(afc_client_t client, uint64_t handle)
 {
 	uint32_t bytes = 0;
 	afc_error_t ret = AFC_E_UNKNOWN_ERROR;
@@ -863,7 +843,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_file_close(afc_client_t client, uint64_t ha
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_file_lock(afc_client_t client, uint64_t handle, afc_lock_op_t operation)
+afc_error_t afc_file_lock(afc_client_t client, uint64_t handle, afc_lock_op_t operation)
 {
 	uint32_t bytes = 0;
 	struct lockinfo {
@@ -897,7 +877,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_file_lock(afc_client_t client, uint64_t han
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_file_seek(afc_client_t client, uint64_t handle, int64_t offset, int whence)
+afc_error_t afc_file_seek(afc_client_t client, uint64_t handle, int64_t offset, int whence)
 {
 	uint32_t bytes = 0;
 	struct seekinfo {
@@ -931,7 +911,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_file_seek(afc_client_t client, uint64_t han
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_file_tell(afc_client_t client, uint64_t handle, uint64_t *position)
+afc_error_t afc_file_tell(afc_client_t client, uint64_t handle, uint64_t *position)
 {
 	char *buffer = NULL;
 	uint32_t bytes = 0;
@@ -966,7 +946,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_file_tell(afc_client_t client, uint64_t han
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_file_truncate(afc_client_t client, uint64_t handle, uint64_t newsize)
+afc_error_t afc_file_truncate(afc_client_t client, uint64_t handle, uint64_t newsize)
 {
 	uint32_t bytes = 0;
 	struct truncinfo {
@@ -998,7 +978,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_file_truncate(afc_client_t client, uint64_t
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_truncate(afc_client_t client, const char *path, uint64_t newsize)
+afc_error_t afc_truncate(afc_client_t client, const char *path, uint64_t newsize)
 {
 	if (!client || !path || !client->afc_packet || !client->parent)
 		return AFC_E_INVALID_ARG;
@@ -1031,7 +1011,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_truncate(afc_client_t client, const char *p
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_make_link(afc_client_t client, afc_link_type_t linktype, const char *target, const char *linkname)
+afc_error_t afc_make_link(afc_client_t client, afc_link_type_t linktype, const char *target, const char *linkname)
 {
 	if (!client || !target || !linkname || !client->afc_packet || !client->parent)
 		return AFC_E_INVALID_ARG;
@@ -1072,7 +1052,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_make_link(afc_client_t client, afc_link_typ
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_set_file_time(afc_client_t client, const char *path, uint64_t mtime)
+afc_error_t afc_set_file_time(afc_client_t client, const char *path, uint64_t mtime)
 {
 	if (!client || !path || !client->afc_packet || !client->parent)
 		return AFC_E_INVALID_ARG;
@@ -1105,7 +1085,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_set_file_time(afc_client_t client, const ch
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_remove_path_and_contents(afc_client_t client, const char *path)
+afc_error_t afc_remove_path_and_contents(afc_client_t client, const char *path)
 {
 	uint32_t bytes = 0;
 	afc_error_t ret = AFC_E_UNKNOWN_ERROR;
@@ -1137,7 +1117,7 @@ LIBIMOBILEDEVICE_API afc_error_t afc_remove_path_and_contents(afc_client_t clien
 	return ret;
 }
 
-LIBIMOBILEDEVICE_API afc_error_t afc_dictionary_free(char **dictionary)
+afc_error_t afc_dictionary_free(char **dictionary)
 {
 	int i = 0;
 

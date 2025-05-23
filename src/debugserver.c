@@ -130,9 +130,7 @@ debugserver_error_t debugserver_client_send(debugserver_client_t client, const c
 		return DEBUGSERVER_E_INVALID_ARG;
 	}
 
-#ifdef VERBOSE_LOGGING
 	debug_info("sending %d bytes", size);
-#endif
 	res = debugserver_error(service_send(client->parent, data, size, (uint32_t*)&bytes));
 	if (bytes <= 0) {
 		debug_info("ERROR: sending to device failed.");

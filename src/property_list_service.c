@@ -129,19 +129,12 @@ static property_list_service_error_t internal_plist_send(property_list_service_c
 	}
 
 	nlen = htobe32(length);
-#ifdef VERBOSE_LOGGING
 	debug_info("sending %d bytes", length);
-#endif
 	service_send(client->parent, (const char*)&nlen, sizeof(nlen), &bytes);
 	if (bytes == sizeof(nlen)) {
 		service_send(client->parent, content, length, &bytes);
 		if (bytes > 0) {
-#ifdef VERBOSE_LOGGING
 			debug_info("sent %d bytes", bytes);
-#endif
-			if (client->parent->connection && client->parent->connection->device && client->parent->connection->device->udid) {
-				//debug_info("udid: %s", client->parent->connection->device->udid);
-			}
 			debug_plist(plist);
 			if (bytes == length) {
 				res = PROPERTY_LIST_SERVICE_E_SUCCESS;
@@ -209,17 +202,13 @@ static property_list_service_error_t internal_plist_receive_timeout(property_lis
 		return PROPERTY_LIST_SERVICE_E_RECEIVE_TIMEOUT;
 	}
 
-#ifdef VERBOSE_LOGGING
 	debug_info("initial read=%i", bytes);
-#endif
 
 	uint32_t curlen = 0;
 	char *content = NULL;
 
 	pktlen = be32toh(pktlen);
-#ifdef VERBOSE_LOGGING
 	debug_info("%d bytes following", pktlen);
-#endif
 	content = (char*)malloc(pktlen);
 	if (!content) {
 		debug_info("out of memory when allocating %d bytes", pktlen);
@@ -232,9 +221,7 @@ static property_list_service_error_t internal_plist_receive_timeout(property_lis
 			res = service_to_property_list_service_error(serr);
 			break;
 		}
-#ifdef VERBOSE_LOGGING
 		debug_info("received %d bytes", bytes);
-#endif
 		curlen += bytes;
 	}
 
@@ -242,7 +229,7 @@ static property_list_service_error_t internal_plist_receive_timeout(property_lis
 		debug_info("received incomplete packet (%d of %d bytes)", curlen, pktlen);
 		if (curlen > 0) {
 			debug_info("incomplete packet following:");
-			//debug_buffer(content, curlen);
+			debug_buffer(content, curlen);
 		}
 		free(content);
 		return res;
@@ -259,14 +246,11 @@ static property_list_service_error_t internal_plist_receive_timeout(property_lis
 		plist_from_xml(content, pktlen, plist);
 	} else {
 		debug_info("WARNING: received unexpected non-plist content");
-		//debug_buffer(content, pktlen);
+		debug_buffer(content, pktlen);
 	}
 
 	if (*plist) {
-        if (client->parent->connection && client->parent->connection->device && client->parent->connection->device->udid) {
-            //debug_info("udid: %s", client->parent->connection->device->udid);
-        }
-		//debug_plist(*plist);
+		debug_plist(*plist);
 		res = PROPERTY_LIST_SERVICE_E_SUCCESS;
 	} else {
 		res = PROPERTY_LIST_SERVICE_E_PLIST_ERROR;

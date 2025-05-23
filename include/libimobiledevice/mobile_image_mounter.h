@@ -24,11 +24,6 @@
 #ifndef IMOBILE_IMAGE_MOUNTER_H
 #define IMOBILE_IMAGE_MOUNTER_H
 
-#if defined(_MSC_VER)
-#include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,7 +50,7 @@ typedef struct mobile_image_mounter_client_private mobile_image_mounter_client_p
 typedef mobile_image_mounter_client_private *mobile_image_mounter_client_t; /**< The client handle. */
 
 /** callback for image upload */
-typedef ssize_t *mobile_image_mounter_upload_cb_t (void* buffer, size_t length, void *user_data);
+typedef ssize_t (*mobile_image_mounter_upload_cb_t) (void* buffer, size_t length, void *user_data);
 
 /* Interface */
 
