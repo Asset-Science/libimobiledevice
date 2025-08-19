@@ -984,6 +984,21 @@
 	 }
 	 return IDEVICE_E_SUCCESS;
  }
+
+ unsigned int idevice_get_device_version(idevice_t device)
+ {
+	 if (!device) {
+		 return 0;
+	 }
+	 if (!device->version) {
+		 lockdownd_client_t lockdown = NULL;
+		 lockdownd_client_new(device, &lockdown, NULL);
+		 // we don't handle any errors here. We should have the product version cached now.
+		 lockdownd_client_free(lockdown);
+	 }
+	 return device->version;
+ }
+
  
  #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
  typedef ssize_t ssl_cb_ret_type_t;
