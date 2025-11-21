@@ -946,6 +946,20 @@ idevice_error_t idevice_get_udid(idevice_t device, char **udid)
 	return IDEVICE_E_SUCCESS;
 }
 
+unsigned int idevice_get_device_version(idevice_t device)
+{
+	if (!device) {
+		return 0;
+	}
+	if (!device->version) {
+		lockdownd_client_t lockdown = NULL;
+		lockdownd_client_new(device, &lockdown, NULL);
+		// we don't handle any errors here. We should have the product version cached now.
+		lockdownd_client_free(lockdown);
+	}
+	return device->version;
+}
+
 #if defined(HAVE_OPENSSL) || defined(HAVE_GNUTLS)
 typedef ssize_t ssl_cb_ret_type_t;
 #elif defined(HAVE_MBEDTLS)
@@ -1065,13 +1079,14 @@ static long ssl_idevice_bio_callback(BIO *b, int oper, const char *argp, int arg
 	idevice_connection_t conn = (idevice_connection_t)BIO_get_callback_arg(b);
 #if OPENSSL_VERSION_NUMBER < 0x30000000L
 	size_t len = (size_t)argi;
-	size_t *processed = (size_t*)&bytes;
 #endif
 	switch (oper) {
 	case (BIO_CB_READ|BIO_CB_RETURN):
 		if (argp) {
 			bytes = internal_ssl_read(conn, (char *)argp, len);
-			*processed = bytes;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+			*processed = (size_t)(bytes < 0) ? 0 : bytes;
+#endif
 			return (long)bytes;
 		}
 		return 0;
@@ -1080,7 +1095,9 @@ static long ssl_idevice_bio_callback(BIO *b, int oper, const char *argp, int arg
 		// fallthrough
 	case (BIO_CB_WRITE|BIO_CB_RETURN):
 		bytes = internal_ssl_write(conn, argp, len);
-		*processed = bytes;
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+		*processed = (size_t)(bytes < 0) ? 0 : bytes;
+#endif
 		return (long)bytes;
 	default:
 		return retvalue;
@@ -1229,7 +1246,7 @@ idevice_error_t idevice_connection_enable_ssl(idevice_connection_t connection)
 #if OPENSSL_VERSION_NUMBER < 0x10100002L || \
 	(defined(LIBRESSL_VERSION_NUMBER) && (LIBRESSL_VERSION_NUMBER < 0x2060000fL))
 	/* force use of TLSv1 for older devices */
-	if (connection->device->version < DEVICE_VERSION(10,0,0)) {
+	if (connection->device->version < IDEVICE_DEVICE_VERSION(10,0,0)) {
 #ifdef SSL_OP_NO_TLSv1_1
 		SSL_CTX_set_options(ssl_ctx, SSL_OP_NO_TLSv1_1);
 #endif
@@ -1242,7 +1259,7 @@ idevice_error_t idevice_connection_enable_ssl(idevice_connection_t connection)
 	}
 #else
 	SSL_CTX_set_min_proto_version(ssl_ctx, TLS1_VERSION);
-	if (connection->device->version < DEVICE_VERSION(10,0,0)) {
+	if (connection->device->version < IDEVICE_DEVICE_VERSION(10,0,0)) {
 		SSL_CTX_set_max_proto_version(ssl_ctx, TLS1_VERSION);
 		if (connection->device->version == 0) {
 			/*
@@ -1533,4 +1550,29 @@ idevice_error_t idevice_connection_disable_bypass_ssl(idevice_connection_t conne
 	debug_info("SSL mode disabled");
 
 	return IDEVICE_E_SUCCESS;
+}
+
+const char* idevice_strerror(idevice_error_t err)
+{
+	switch (err) {
+		case IDEVICE_E_SUCCESS:
+			return "Success";
+		case IDEVICE_E_INVALID_ARG:
+			return "Invalid argument";
+		case IDEVICE_E_UNKNOWN_ERROR:
+			return "Unknown Error";
+		case IDEVICE_E_NO_DEVICE:
+			return "No device";
+		case IDEVICE_E_NOT_ENOUGH_DATA:
+			return "Not enough data";
+		case IDEVICE_E_CONNREFUSED:
+			return "Connection refused";
+		case IDEVICE_E_SSL_ERROR:
+			return "SSL error";
+		case IDEVICE_E_TIMEOUT:
+			return "Timeout";
+		default:
+			break;
+	}
+	return "Unknown Error";
 }
