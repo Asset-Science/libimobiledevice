@@ -307,7 +307,7 @@ static afc_error_t afc_receive_data(afc_client_t client, char **bytes, uint32_t 
 			current_count += recv_len;
 		}
 		if (current_count < entire_len) {
-			debug_info("WARNING: could not receive full packet (read %s, size %d)", current_count, entire_len);
+			debug_info("WARNING: could not receive full packet (read %d, size %d)", current_count, entire_len);
 		}
 	}
 
