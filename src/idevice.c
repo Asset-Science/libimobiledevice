@@ -470,7 +470,7 @@ static idevice_t idevice_from_mux_device(usbmuxd_device_info_t *muxdev)
 	return device;
 }
 
-idevice_error_t idevice_new_with_options(idevice_t * device, const char *udid, enum idevice_options options)
+idevice_error_t idevice_new_with_options(idevice_t * device, const char *udid, enum idevice_options options, bool* stop)
 {
 	usbmuxd_device_info_t muxdev;
 	int usbmux_options = 0;
@@ -483,7 +483,7 @@ idevice_error_t idevice_new_with_options(idevice_t * device, const char *udid, e
 	if (options & IDEVICE_LOOKUP_PREFER_NETWORK) {
 		usbmux_options |= DEVICE_LOOKUP_PREFER_NETWORK;
 	}
-	int res = usbmuxd_get_device(udid, &muxdev, usbmux_options);
+	int res = usbmuxd_get_device(udid, &muxdev, usbmux_options, stop);
 	if (res > 0) {
 		*device = idevice_from_mux_device(&muxdev);
 		if (!*device) {
@@ -494,9 +494,9 @@ idevice_error_t idevice_new_with_options(idevice_t * device, const char *udid, e
 	return IDEVICE_E_NO_DEVICE;
 }
 
-idevice_error_t idevice_new(idevice_t * device, const char *udid)
+idevice_error_t idevice_new(idevice_t * device, const char *udid, bool* stop)
 {
-	return idevice_new_with_options(device, udid, 0);
+	return idevice_new_with_options(device, udid, 0, stop);
 }
 
 idevice_error_t idevice_free(idevice_t device)
@@ -1105,7 +1105,10 @@ static int ssl_verify_callback(int ok, X509_STORE_CTX *ctx)
 	return 1;
 }
 
-#ifndef STRIP_DEBUG_CODE
+// Was wrapped in #ifndef STRIP_DEBUG_CODE, but the caller (debug_info(...)
+// at the SSL handshake error log) is unconditional in this fork's build.
+// Either both have to be gated or neither — keeping the function defined
+// is the smaller change.
 static const char *ssl_error_to_string(int e)
 {
 	switch(e) {
@@ -1131,7 +1134,6 @@ static const char *ssl_error_to_string(int e)
 			return "UNKOWN_ERROR_VALUE";
 	}
 }
-#endif
 #endif
 
 #if defined(HAVE_GNUTLS)
