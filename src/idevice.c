@@ -302,14 +302,14 @@ idevice_error_t idevice_event_unsubscribe(void)
 	return idevice_events_unsubscribe(event_ctx);
 }
 
-idevice_error_t idevice_get_device_list_extended(idevice_info_t **devices, int *count)
+idevice_error_t idevice_get_device_list_extended(idevice_info_t **devices, int *count, bool* stop)
 {
 	usbmuxd_device_info_t *dev_list;
 
 	*devices = NULL;
 	*count = 0;
 
-	if (usbmuxd_get_device_list(&dev_list) < 0) {
+	if (usbmuxd_get_device_list(&dev_list, stop) < 0) {
 		debug_info("ERROR: usbmuxd is not running!", __func__);
 		return IDEVICE_E_NO_DEVICE;
 	}
@@ -372,14 +372,14 @@ idevice_error_t idevice_device_list_extended_free(idevice_info_t *devices)
 	return IDEVICE_E_SUCCESS;
 }
 
-idevice_error_t idevice_get_device_list(char ***devices, int *count)
+idevice_error_t idevice_get_device_list(char ***devices, int *count, bool *stop)
 {
 	usbmuxd_device_info_t *dev_list;
 
 	*devices = NULL;
 	*count = 0;
 
-	if (usbmuxd_get_device_list(&dev_list) < 0) {
+	if (usbmuxd_get_device_list(&dev_list, stop) < 0) {
 		debug_info("ERROR: usbmuxd is not running!", __func__);
 		return IDEVICE_E_NO_DEVICE;
 	}
