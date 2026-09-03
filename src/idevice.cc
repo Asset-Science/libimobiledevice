@@ -722,7 +722,7 @@
 			 }
 			 sent += s;
 		 }
-		 debug_info("SSL_write %d, sent %d", len, sent);
+		 debug_info_io("SSL_write %d, sent %d", len, sent);
 		 if (sent < len) {
 			 *sent_bytes = 0;
 			 return connection->status == IDEVICE_E_SUCCESS ? IDEVICE_E_SSL_ERROR : connection->status;
@@ -1016,7 +1016,7 @@
 	 idevice_error_t res;
 	 unsigned int timeout = connection->ssl_recv_timeout;
  
-	 debug_info("pre-read length = %zi bytes", length);
+	 debug_info_io("pre-read length = %zi bytes", length);
  
 	 /* repeat until we have the full data or an error occurs */
 	 do {

@@ -324,7 +324,7 @@ static afc_error_t afc_receive_data(afc_client_t client, char **bytes, uint32_t 
 #endif
 		//debug_buffer(buf, 256);
 	} else {
-		debug_info("packet data follows");
+		debug_info_io("packet data follows");
 		//debug_buffer(buf, current_count);
 	}
 
@@ -766,7 +766,7 @@ afc_error_t afc_file_read(afc_client_t client, uint64_t handle, char *data, uint
 	}
 	/* Receive the data */
 	ret = afc_receive_data(client, &input, &bytes_loc);
-	debug_info("afc_receive_data returned error: %d", ret);
+	debug_info_io("afc_receive_data returned: %d", ret);
 #ifdef VERBOSE_LOGGING
 	debug_info("bytes returned: %i", bytes_loc);
 #endif
